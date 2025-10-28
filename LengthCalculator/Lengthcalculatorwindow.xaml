@@ -1,0 +1,261 @@
+<Window x:Class="LengthCalculator.LengthCalculatorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Length Calculator" 
+        Height="650" 
+        Width="900"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
+        Background="#F5F5F7"
+        FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <!-- macOS-inspired rounded button style -->
+        <Style x:Key="MacButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#007AFF"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#0051D5"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#E5E5EA"/>
+                    <Setter Property="Foreground" Value="#8E8E93"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Secondary button style -->
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource MacButtonStyle}">
+            <Setter Property="Background" Value="#F2F2F7"/>
+            <Setter Property="Foreground" Value="#000000"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E5E5EA"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Card style for result display -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#000000" Opacity="0.08" BlurRadius="20" ShadowDepth="0"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- TextBlock header style -->
+        <Style x:Key="HeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#1D1D1F"/>
+            <Setter Property="Margin" Value="0,0,0,20"/>
+        </Style>
+
+        <!-- Summary stat style -->
+        <Style x:Key="StatLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#86868B"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+        </Style>
+
+        <Style x:Key="StatValueStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Foreground" Value="#1D1D1F"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" 
+                   Text="Length Calculator" 
+                   Style="{StaticResource HeaderStyle}"/>
+
+        <!-- Summary Cards -->
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Total Elements -->
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="TOTAL ELEMENTS" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock x:Name="txtTotalElements" Text="0" Style="{StaticResource StatValueStyle}"/>
+                </StackPanel>
+
+                <!-- Elements with Length -->
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="WITH LENGTH" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock x:Name="txtWithLength" Text="0" Style="{StaticResource StatValueStyle}"/>
+                </StackPanel>
+
+                <!-- Total Length (Project Units) -->
+                <StackPanel Grid.Column="2">
+                    <TextBlock x:Name="txtTotalLengthLabel" Text="TOTAL LENGTH" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock x:Name="txtTotalLength" Text="0.00" Style="{StaticResource StatValueStyle}"/>
+                </StackPanel>
+
+                <!-- Alternative Units -->
+                <StackPanel Grid.Column="3">
+                    <TextBlock Text="METRIC / IMPERIAL" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock x:Name="txtAlternativeUnits" Text="0 m / 0 ft" Style="{StaticResource StatValueStyle}" FontSize="16"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Results DataGrid -->
+        <Border Grid.Row="2" Style="{StaticResource CardStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" 
+                           Text="Element Details" 
+                           FontSize="16" 
+                           FontWeight="SemiBold" 
+                           Foreground="#1D1D1F"
+                           Margin="0,0,0,15"/>
+
+                <DataGrid Grid.Row="1" 
+                          x:Name="dgResults"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          GridLinesVisibility="None"
+                          HeadersVisibility="Column"
+                          BorderThickness="0"
+                          Background="Transparent"
+                          RowBackground="Transparent"
+                          AlternatingRowBackground="#F9F9F9"
+                          CanUserResizeRows="False"
+                          CanUserReorderColumns="False"
+                          SelectionMode="Extended"
+                          SelectionUnit="FullRow">
+
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#F2F2F7"/>
+                            <Setter Property="Foreground" Value="#1D1D1F"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="FontSize" Value="13"/>
+                            <Setter Property="Padding" Value="12,10"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="Padding" Value="12,8"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="DataGridCell">
+                                        <Border Padding="{TemplateBinding Padding}" 
+                                                Background="{TemplateBinding Background}">
+                                            <ContentPresenter VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="#007AFF"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.CellStyle>
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Element Name" Binding="{Binding ElementName}" Width="2*"/>
+                        <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="*"/>
+                        <DataGridTextColumn Header="Length" Binding="{Binding LengthDisplay}" Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                                    <Setter Property="FontWeight" Value="Medium"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- Action Buttons -->
+        <Grid Grid.Row="3" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" 
+                    x:Name="btnCalculate" 
+                    Content="Calculate" 
+                    Style="{StaticResource MacButtonStyle}"
+                    Click="BtnCalculate_Click"
+                    Margin="0,0,10,0"/>
+
+            <Button Grid.Column="2" 
+                    x:Name="btnCopy" 
+                    Content="Copy to Clipboard" 
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    Click="BtnCopy_Click"
+                    IsEnabled="False"
+                    Margin="0,0,10,0"/>
+
+            <Button Grid.Column="3" 
+                    x:Name="btnExport" 
+                    Content="Export to Excel" 
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    Click="BtnExport_Click"
+                    IsEnabled="False"
+                    Margin="0,0,10,0"/>
+
+            <Button Grid.Column="4" 
+                    x:Name="btnClose" 
+                    Content="Close" 
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    Click="BtnClose_Click"/>
+        </Grid>
+    </Grid>
+</Window>
